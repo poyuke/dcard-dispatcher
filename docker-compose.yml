@@ -1,0 +1,35 @@
+version: "3.5"
+
+services:
+  redis:
+    image: redis:6.2.3-alpine
+    restart: always
+    environment:
+      IP: 0.0.0.0
+    ports:
+      - "6379:6379"
+    networks:
+      - dcard
+
+  dispatcher:
+    container_name: dispatcher
+    image: dispatcher:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - ./:/src
+    depends_on:
+      - redis
+    links:
+      - redis:redis
+    command: ["dispatcher"]
+    networks:
+      - dcard
+
+networks:
+  dcard:
+    name: dcard
+    driver: bridge
